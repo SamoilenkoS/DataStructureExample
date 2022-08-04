@@ -1,9 +1,60 @@
 ﻿using DataStructureLibrary;
 using NUnit.Framework;
 using System;
+using System.Linq;
 
 namespace DataStructure.Tests
 {
+    public class Tests
+    {
+        [Test]
+        public void Test()
+        {
+            var items = new int[5];
+            for (int i = 0; i < 5; i++)
+            {
+                items[i] = (i + 1) * 2;
+            }
+
+            items.Count(x => x % 2 == 0);
+            var isRight = items.All(MoreThanTen);
+            var response = items.Select(QQQ);
+            response.Count();
+
+            TT(() => 
+            {
+                Console.WriteLine();
+                var items = new int[5];
+                for (int i = 0; i < 5; i++)
+                {
+                    items[i] = (i + 1) * 2;
+                }
+            });
+        }
+
+        private bool MoreThanTen(int arg)
+        {
+            return arg < 10;
+        }
+
+        public void TT(Action action)
+        {
+            //
+            //
+            action?.Invoke();
+            //
+            //
+        }
+        //count
+        //foreach(var item in items)
+        //{if(action.Invoke(item))
+        //count++}
+        //return count;
+        private object QQQ(int arg1, int arg2)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class ArrayListTests : MyListTests<MyArray<int>>
     {
         public override IMyList<int> CreateList(int[] sourceArray)
