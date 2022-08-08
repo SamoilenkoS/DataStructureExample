@@ -1,12 +1,47 @@
 ﻿using DataStructureLibrary;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DataStructure.Tests
 {
     public class Tests
     {
+        static private void Swap<T>(ref T x, ref T y)
+        {
+            var temp = x;
+            x = y;
+            y = temp;
+        }
+
+        public static IEnumerable<T> Sort<T>(T[] items, Func<T, T, int> comparer)
+        {
+            for (int i = 0; i < items.Length; i++)
+            {
+                for (int j = i + 1; j < items.Length; j++)
+                {
+                    if (comparer(items[i], items[j]) > 0)
+                    {
+                        Swap(ref items[i], ref items[j]);
+                    }
+                }
+            }
+
+            foreach (var item in items)
+            {
+                yield return item;
+            }
+        }
+
+        [Test]
+        public void TT()
+        {
+            var array = new int[] { 1, 5, 4, 2, 3 };
+            var sorted = Sort(array, (x, y) => x.CompareTo(y));
+
+        }
+
         [Test]
         public void Test()
         {
