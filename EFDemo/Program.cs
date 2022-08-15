@@ -98,17 +98,82 @@ namespace EFDemo
 
     public class ForChange
     {
-        private int Test;
+        private static int PrivateStatic;
+        private int Private;
+        protected int Protected;
+        protected static int ProtectedStatic;
+        public int Public;
+        public static int PublicStatic;
+        internal int Internal;
+        internal static int InternalStatic;
+
+        public int GetProtected()
+        {
+            return Protected;
+        }
+
+        public void SetProtected(int @protected)
+        {
+            Protected = @protected;
+        }
+
+        public int PublicProperty
+        {
+            get => Private;
+            set
+            {
+                Private = value;
+            }
+        }
+
         public ForChange()
         {
-            Test = 10;
+            Private = 10;
         }
 
         public void Print()
         {
-            Console.WriteLine(Test);
+            Console.WriteLine(Private);
         }
     }
+
+    public class Car
+    {
+        public virtual int GetMaxSpeed()
+        {
+            return 200;
+        }
+
+        public void Test(int a = 5, int b = 10, int c = 100)
+        {
+
+        }
+
+        /// <summary>
+        /// Sum all items
+        /// </summary>
+        /// <param name="test">Some input string</param>
+        /// <param name="data">Data array of ints</param>
+        /// <returns></returns>
+        public int Sum(string test, params int[] data)
+        {
+            return data.Sum();
+        }
+    }
+
+    public class Ferrari : Car
+    {
+        public override int GetMaxSpeed()
+        {
+            return 500;
+        }
+    }
+
+    public class Gelly : Car
+    {
+        //
+    }
+
     class Program
     {
         static Random random = new Random();
@@ -146,10 +211,56 @@ namespace EFDemo
             }
         }
 
+        static string GetData()
+        {
+            return random.NextDouble() > 0.9 ? "OK" : "Fail";
+        }
+
+        static bool RepeatActionUntilConditionIsFalse(Action action, Func<bool> condition, int count = 3)
+        {
+            bool result;
+            do
+            {
+                action();
+                result = condition();
+                //timeout
+            } while (!result && --count > 0);
+
+            return result;
+        }
+
         static void Main()
         {
+            Car[] cars = new Car[3];
+            cars[0] = new Car();
+            cars[1] = new Ferrari();
+            cars[2] = new Gelly();
+
+            foreach (var car in cars)
+            {
+                Console.WriteLine($"{car} {car.GetMaxSpeed()}");
+            }
+
+            Console.WriteLine(cars[0].Sum("hello", 10, 20, 150, 40));
+
+            Console.WriteLine(cars[0].Sum("world!"));
+
+
+            Random random = new Random();
+            string current = string.Empty;
+            //var response = RepeatActionUntilConditionIsFalse(
+            //    () => { current = GetData(); }, () => current == "OK");
+
             ForChange forChange = new ForChange();
-            var fields = forChange.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            var fields = forChange.GetType().GetFields(
+                BindingFlags.NonPublic |
+               // BindingFlags.Static |
+                BindingFlags.Public |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly |
+                BindingFlags.GetProperty |
+                BindingFlags.SetProperty);
+            var properties = forChange.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach(var field in fields)
             {
                 Console.WriteLine(field);
@@ -157,7 +268,7 @@ namespace EFDemo
 
             var myFieldInfo = forChange.GetType().GetField("Test",
             BindingFlags.NonPublic | BindingFlags.Instance);
-            myFieldInfo.SetValue(forChange, 55);
+            //myFieldInfo.SetValue(forChange, 55);
             forChange.Print();
             // BindingFlags.InvokeMethod
             // Call a static method.
@@ -233,8 +344,10 @@ namespace EFDemo
             Console.WriteLine("---------------------------------------");
             // BindingFlags.InvokeMethod
             // Call a method using named parameters.
-            object[] argValues = new object[] { "Mouse", "Micky" };
+            object[] argValues = new object[] { 123.ToString(), "Micky" };
             String[] argNames = new String[] { "lastName", "firstName" };
+            var method = t.GetMethod("PrintName", BindingFlags.Static | BindingFlags.Public);
+            method.Invoke(null, argValues);
             t.InvokeMember("PrintName", BindingFlags.InvokeMethod, null, null, argValues, null, null,
                 argNames);
 
